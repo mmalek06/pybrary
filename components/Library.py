@@ -1,8 +1,9 @@
 import typing
 
 from errors import BookBorrowedError, BookNotFoundError
-from functions import lev_dist
 from models import Author, User, Book
+
+from .functions import lev_dist
 
 
 class Library:
@@ -49,7 +50,7 @@ class Library:
 
         return candidates
 
-    def rent_book(self, isbn: str, user: User) -> Book:
+    def borrow_book(self, isbn: str, user: User) -> Book:
         found_book = self.__find_book(isbn)
 
         if found_book not in self.borrowed_books:

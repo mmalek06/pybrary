@@ -1,4 +1,5 @@
 from components.Library import Library
+from components.ui.UI import UI
 from models import Author, Book
 
 
@@ -17,5 +18,33 @@ lib = Library([
         'Trylogia Husycka',
         [Author('4', 'Andrzej Sapkowski')],
         3
+    ),
+    Book(
+        '3456',
+        'Wiedzmin',
+        [Author('4', 'Andrzej Sapkowski')],
+        1
+    ),
+    Book(
+        '4567',
+        'Starosc Aksolotla',
+        [Author('5', 'Jacek Dukaj')],
+        10
+    ),
+    Book(
+        '5678',
+        'Imperium Chmur',
+        [Author('5', 'Jacek Dukaj')],
+        5
+    ),
+    Book(
+        '6789',
+        'Through a Scanner Darkly',
+        [Author('5', 'Philip K. Dick')],
+        5
     )
 ])
+ui = UI()
+
+while ui.show():
+    ui.action()
