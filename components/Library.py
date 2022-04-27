@@ -13,15 +13,15 @@ class Library:
     __book_search_sensitivity: int = 10
     __author_search_sensitivity: int = 2
 
-    def __init__(self, books_with_authors: list[Book]):
-        self.__books = books_with_authors
+    def __init__(self, books: list[Book]):
+        self.__books = books
 
     def list_authors_books(self, maybe_author_name: str):
         found_books = []
 
         for book in self.__books:
             for author in book.authors:
-                distance = lev_dist(author.name, maybe_author_name)
+                distance = lev_dist(author.name.lower(), maybe_author_name.lower())
 
                 if distance > self.__author_search_sensitivity:
                     continue

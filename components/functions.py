@@ -1,5 +1,3 @@
-import os
-
 from functools import lru_cache
 
 
@@ -38,12 +36,3 @@ def lev_dist(a: str, b: str) -> int:
         )
 
     return min_dist(0, 0)
-
-
-def clear_console():
-    command = 'clear'
-
-    if os.name in ('nt', 'dos'):  # If Machine is running on Windows, use cls
-        command = 'cls'
-
-    os.system(command)

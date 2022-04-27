@@ -1,34 +1,44 @@
-from components.functions import clear_console
+from components.io import ConsoleInput, ConsoleOutput
 from components.ui.enums import ActionType
 from models import Book
 
 
 class UI:
+    __input: ConsoleInput
+    __output: ConsoleOutput
     __chosen_action: ActionType
     __callbacks: dict[ActionType, list]
 
-    def __init__(self):
+    def __init__(self, cinput: ConsoleInput, output: ConsoleOutput):
+        self.__input = cinput
+        self.__output = output
         self.__chosen_action = ActionType.NONE
         self.__callbacks = dict()
 
-    def show(self) -> bool:
-        print('')
-        UI.__print_delimiter()
-        print('Welcome to our Library. What can we do for you?')
-        print('1 - list author\'s books')
-        print('2 - find a book')
-        print('3 - borrow a book')
-        print('4 - return a book')
-        print('5 - exit program')
-        UI.__print_delimiter()
-        print('')
+    def register_callback(self, callback, action_type: ActionType):
+        if action_type not in self.__callbacks:
+            self.__callbacks[action_type] = []
 
-        chosen_action = int(input())
+        self.__callbacks[action_type].append(callback)
+
+    def show(self) -> bool:
+        self.__output.print('')
+        self.__output.print_delimiter()
+        self.__output.print('Welcome to our Library. What can we do for you?')
+        self.__output.print('1 - list author\'s books')
+        self.__output.print('2 - find a book')
+        self.__output.print('3 - borrow a book')
+        self.__output.print('4 - return a book')
+        self.__output.print('5 - exit program')
+        self.__output.print_delimiter()
+        self.__output.print('')
+
+        chosen_action = int(self.__input.input())
 
         if chosen_action is 5:
             return False
 
-        clear_console()
+        self.__output.clear()
 
         if chosen_action > 5 or chosen_action <= 0:
             self.__chosen_action = ActionType.NONE
@@ -41,7 +51,7 @@ class UI:
         if self.__chosen_action is ActionType.NONE:
             return
         if self.__chosen_action is ActionType.LIST_BOOKS:
-            pass
+            self.__list_books()
         if self.__chosen_action is ActionType.FIND_BOOK:
             pass
         if self.__chosen_action is ActionType.BORROW_BOOK:
@@ -52,10 +62,10 @@ class UI:
             pass
 
     def __list_books(self):
-        UI.__print_delimiter()
-        print('Please type in the author\'s name: ')
+        self.__output.print_delimiter()
+        self.__output.print('Please type in the author\'s name: ')
 
-        author_name = input()
+        author_name = self.__input.input()
 
         if ActionType.LIST_BOOKS in self.__callbacks:
             for callback in self.__callbacks[ActionType.LIST_BOOKS]:
@@ -63,13 +73,14 @@ class UI:
 
                 if result is None:
                     continue
+                if not isinstance(result, list):
+                    continue
 
-                if result is list[Book]:
-                    for book in result:
-                        print(f'Book: {book.title}, ISBN: {book.isbn}')
+                self.__output.print('')
 
-        UI.__print_delimiter()
+                for book in result:
+                    self.__output.print(f'Book: {book.title}, ISBN: {book.isbn}')
 
-    @staticmethod
-    def __print_delimiter():
-        print('=' * 50)
+                self.__output.print('')
+
+        self.__output.print_delimiter()

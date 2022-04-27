@@ -1,4 +1,6 @@
+from components.io import ConsoleInput, ConsoleOutput
 from components.Library import Library
+from components.ui.enums import ActionType
 from components.ui.UI import UI
 from models import Author, Book
 
@@ -44,7 +46,11 @@ lib = Library([
         5
     )
 ])
-ui = UI()
+cinput = ConsoleInput()
+output = ConsoleOutput()
+ui = UI(cinput, output)
+
+ui.register_callback(lib.list_authors_books, ActionType.LIST_BOOKS)
 
 while ui.show():
     ui.action()
