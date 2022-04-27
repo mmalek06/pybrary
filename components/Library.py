@@ -16,7 +16,7 @@ class Library:
     def __init__(self, books: list[Book]):
         self.__books = books
 
-    def list_authors_books(self, maybe_author_name: str):
+    def list_authors_books(self, maybe_author_name: str) -> list[Book]:
         found_books = []
 
         for book in self.__books:

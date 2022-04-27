@@ -51,6 +51,11 @@ output = ConsoleOutput()
 ui = UI(cinput, output)
 
 ui.register_callback(lib.list_authors_books, ActionType.LIST_BOOKS)
+ui.register_callback(lib.find_book, ActionType.FIND_BOOK)
+ui.register_callback(lib.borrow_book, ActionType.BORROW_BOOK)
 
 while ui.show():
-    ui.action()
+    result = ui.action()
+
+    if result == ActionType.EXIT:
+        break

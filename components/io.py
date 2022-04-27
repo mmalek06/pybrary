@@ -2,7 +2,7 @@ import os
 
 
 class ConsoleOutput:
-    def print(self, msg: str):
+    def print(self, msg):
         print(msg)
 
     def print_delimiter(self):
