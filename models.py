@@ -16,8 +16,3 @@ class Book(NamedTuple):
         authors = ', '.join(map(lambda author: author.name, self.authors))
 
         return f'Book: {self.title}, ISBN: {self.isbn}, written by: {authors}'
-
-
-class User(NamedTuple):
-    identifier: str
-    name: str

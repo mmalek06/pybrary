@@ -1,13 +1,13 @@
 import typing
 
 from errors import BookBorrowedError, BookNotFoundError
-from models import Author, User, Book
+from models import Author, Book
 
 from .functions import lev_dist
 
 
 class Library:
-    borrowed_books = dict[Book, list[User]]()
+    borrowed_books = dict[Book, list[str]]()
 
     __books: list[Book]
     __book_search_sensitivity: int = 10
@@ -50,21 +50,21 @@ class Library:
 
         return candidates
 
-    def borrow_book(self, isbn: str, user: User) -> Book:
-        found_book = self.__find_book(isbn)
+    def borrow_book(self, isbn: str, user_name: str) -> Book:
+        found_book = self.__lookup_book(isbn)
 
         if found_book not in self.borrowed_books:
             self.borrowed_books[found_book] = list()
 
-        self.borrowed_books[found_book].append(user)
+        self.borrowed_books[found_book].append(user_name)
 
         return found_book
 
-    def __find_book(self, isbn) -> Book:
+    def __lookup_book(self, isbn) -> Book:
         for book in self.__books:
             if book.isbn is not isbn:
                 continue
-            if book in self.borrowed_books and len(self.borrowed_books[book]) >= book.stock:
+            if book in self.borrowed_books and book in self.borrowed_books and len(self.borrowed_books[book]) >= book.stock:
                 raise BookBorrowedError(f'Book {book.title} has already been borrowed by someone else.')
 
             return book

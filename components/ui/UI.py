@@ -1,5 +1,4 @@
 from components.io import ConsoleInput, ConsoleOutput
-from components.ui.decorators import with_delimiters
 from components.ui.enums import ActionType
 from models import Book
 
@@ -22,7 +21,6 @@ class UI:
 
         self.__callbacks[action_type].append(callback)
 
-    @with_delimiters
     def show(self) -> bool:
         self.__output.print_delimiter()
         self.__output.print('Welcome to our Library. What can we do for you?')
@@ -32,7 +30,6 @@ class UI:
         self.__output.print('4 - return a book')
         self.__output.print('5 - exit program')
         self.__output.print_delimiter()
-        self.__output.print('')
 
         chosen_action = int(self.__input.input())
 
@@ -48,16 +45,22 @@ class UI:
 
         return True
 
-    @with_delimiters
     def action(self) -> ActionType:
-        if self.__chosen_action is ActionType.LIST_BOOKS:
-            self.__list_books()
-        if self.__chosen_action is ActionType.FIND_BOOK:
-            self.__find_book()
-        if self.__chosen_action is ActionType.BORROW_BOOK:
-            pass
-        if self.__chosen_action is ActionType.RETURN_BOOK:
-            pass
+        self.__output.print_delimiter()
+
+        try:
+            if self.__chosen_action is ActionType.LIST_BOOKS:
+                self.__list_books()
+            if self.__chosen_action is ActionType.FIND_BOOK:
+                self.__find_book()
+            if self.__chosen_action is ActionType.BORROW_BOOK:
+                self.__borrow_book()
+            if self.__chosen_action is ActionType.RETURN_BOOK:
+                pass
+        except Exception as exc:
+            print(exc)
+
+        self.__output.print_delimiter()
 
         return self.__chosen_action
 
@@ -83,6 +86,8 @@ class UI:
 
             for book in result:
                 self.__output.print(book)
+            else:
+                self.__output.print(f'No book found for the author {author_name}')
 
             self.__output.print('')
 
@@ -92,8 +97,6 @@ class UI:
         book_name = self.__input.input()
 
         if ActionType.FIND_BOOK not in self.__callbacks:
-            self.__output.print_delimiter()
-
             return
 
         for callback in self.__callbacks[ActionType.FIND_BOOK]:
@@ -106,3 +109,24 @@ class UI:
             elif isinstance(result, list):
                 for book in result:
                     self.__output.print(book)
+                else:
+                    self.__output.print(f'No book found for the search phrase: {book_name}')
+
+    def __borrow_book(self):
+        self.__output.print('Please type in the ISBN of the book you would like to borrow: ')
+
+        isbn = self.__input.input()
+
+        self.__output.print('')
+        self.__output.print('Please type in the name of the person borrowing the book: ')
+
+        user_name = self.__input.input()
+
+        if ActionType.BORROW_BOOK not in self.__callbacks:
+            return
+
+        for callback in self.__callbacks[ActionType.BORROW_BOOK]:
+            result = callback(isbn, user_name)
+
+            if isinstance(result, Book):
+                self.__output.print(f'{result} borrowed')
