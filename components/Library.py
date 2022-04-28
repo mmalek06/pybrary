@@ -7,13 +7,13 @@ from .functions import lev_dist
 
 
 class Library:
-    borrowed_books = dict[Book, list[str]]()
-
+    __borrowed_books: dict[str, list[str]]
     __books: list[Book]
     __book_search_sensitivity: int = 10
     __author_search_sensitivity: int = 2
 
     def __init__(self, books: list[Book]):
+        self.__borrowed_books = dict()
         self.__books = books
 
     def list_authors_books(self, maybe_author_name: str) -> list[Book]:
@@ -53,18 +53,21 @@ class Library:
     def borrow_book(self, isbn: str, user_name: str) -> Book:
         found_book = self.__lookup_book(isbn)
 
-        if found_book not in self.borrowed_books:
-            self.borrowed_books[found_book] = list()
+        if found_book not in self.__borrowed_books:
+            self.__borrowed_books[found_book.isbn] = list()
 
-        self.borrowed_books[found_book].append(user_name)
+        self.__borrowed_books[found_book.isbn].append(user_name)
 
         return found_book
 
     def __lookup_book(self, isbn) -> Book:
         for book in self.__books:
-            if book.isbn is not isbn:
+            if book.isbn != isbn:
                 continue
-            if book in self.borrowed_books and book in self.borrowed_books and len(self.borrowed_books[book]) >= book.stock:
+
+            entries = self.__borrowed_books[book.isbn]
+
+            if book in self.__borrowed_books and len(entries) >= book.stock:
                 raise BookBorrowedError(f'Book {book.title} has already been borrowed by someone else.')
 
             return book
