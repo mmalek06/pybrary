@@ -31,7 +31,12 @@ class UI:
         self.__output.print('5 - exit program')
         self.__output.print_delimiter()
 
-        chosen_action = int(self.__input.input())
+        option = self.__input.input()
+
+        if option is None or option.strip() == '':
+            return True
+
+        chosen_action = int(option)
 
         if chosen_action == 5:
             return False
