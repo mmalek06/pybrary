@@ -7,4 +7,5 @@ class ActionType(Enum):
     FIND_BOOK = 2
     BORROW_BOOK = 3
     RETURN_BOOK = 4
-    EXIT = 5
+    LIST_STOCK = 5
+    EXIT = 6

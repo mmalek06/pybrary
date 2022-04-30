@@ -1,6 +1,7 @@
-from components.io import ConsoleInput, ConsoleOutput
-from components.ui.enums import ActionType
-from models import Book
+from core.io import ConsoleInput, ConsoleOutput
+from core.enums import ActionType
+from core.models import Book
+from ui.validation import non_empty_validator
 
 
 class UI:
@@ -28,7 +29,8 @@ class UI:
         self.__output.print('2 - find a book')
         self.__output.print('3 - borrow a book')
         self.__output.print('4 - return a book')
-        self.__output.print('5 - exit program')
+        self.__output.print('5 - list stock')
+        self.__output.print('6 - exit program')
         self.__output.print_delimiter()
 
         option = self.__input.input()
@@ -38,12 +40,12 @@ class UI:
 
         chosen_action = int(option)
 
-        if chosen_action == 5:
+        if chosen_action == 6:
             return False
 
         self.__output.clear()
 
-        if chosen_action > 5 or chosen_action <= 0:
+        if chosen_action > 6 or chosen_action <= 0:
             self.__chosen_action = ActionType.NONE
         else:
             self.__chosen_action = ActionType(chosen_action)
@@ -62,6 +64,8 @@ class UI:
                 self.__borrow_book()
             if self.__chosen_action is ActionType.RETURN_BOOK:
                 pass
+            if self.__chosen_action is ActionType.LIST_STOCK:
+                self.__list_stock()
         except Exception as exc:
             print(exc)
 
@@ -70,14 +74,14 @@ class UI:
         return self.__chosen_action
 
     def __list_books(self):
+        if ActionType.LIST_BOOKS not in self.__callbacks:
+            return
+
         self.__output.print('Please type in the author\'s name: ')
 
         author_name = self.__input.input()
 
-        if ActionType.LIST_BOOKS not in self.__callbacks:
-            self.__output.print_delimiter()
-
-            return
+        non_empty_validator(author_name)
 
         for callback in self.__callbacks[ActionType.LIST_BOOKS]:
             result = callback(author_name)
@@ -97,12 +101,14 @@ class UI:
             self.__output.print('')
 
     def __find_book(self):
+        if ActionType.FIND_BOOK not in self.__callbacks:
+            return
+
         self.__output.print('Please type in the name of the book you\'re looking for: ')
 
         book_name = self.__input.input()
 
-        if ActionType.FIND_BOOK not in self.__callbacks:
-            return
+        non_empty_validator(book_name)
 
         for callback in self.__callbacks[ActionType.FIND_BOOK]:
             result = callback(book_name)
@@ -118,20 +124,39 @@ class UI:
                     self.__output.print(f'No book found for the search phrase: {book_name}')
 
     def __borrow_book(self):
+        if ActionType.BORROW_BOOK not in self.__callbacks:
+            return
+
         self.__output.print('Please type in the ISBN of the book you would like to borrow: ')
 
         isbn = self.__input.input()
+
+        non_empty_validator(isbn)
 
         self.__output.print('')
         self.__output.print('Please type in the name of the person borrowing the book: ')
 
         user_name = self.__input.input()
 
-        if ActionType.BORROW_BOOK not in self.__callbacks:
-            return
+        non_empty_validator(user_name)
 
         for callback in self.__callbacks[ActionType.BORROW_BOOK]:
             result = callback(isbn, user_name)
 
             if isinstance(result, Book):
-                self.__output.print(f'{result} borrowed')
+                self.__output.print(f'{result} borrowed.')
+
+    def __list_stock(self):
+        if ActionType.LIST_STOCK not in self.__callbacks:
+            return
+
+        self.__output.print('Below you will find the list of books along with the')
+        self.__output.print('number of copies available: ')
+
+        for callback in self.__callbacks[ActionType.LIST_STOCK]:
+            result = callback()
+
+            if isinstance(result, list):
+                for (book, stock) in result:
+                    self.__output.print(f'{book} - {stock} copies left.')
+

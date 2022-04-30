@@ -1,7 +1,7 @@
 import typing
 
-from errors import BookBorrowedError, BookNotFoundError
-from models import Author, Book
+from .errors import BookBorrowedError, BookNotFoundError
+from .models import Author, Book
 
 from .functions import lev_dist
 
@@ -59,6 +59,16 @@ class Library:
         self.__borrowed_books[found_book.isbn].append(user_name)
 
         return found_book
+
+    def list_stock(self) -> list[(Book, int)]:
+        stock = []
+
+        for key in self.__borrowed_books:
+            book = self.__lookup_book(key)
+
+            stock.append((book, book.stock - len(self.__borrowed_books[key])))
+
+        return stock
 
     def __lookup_book(self, isbn) -> Book:
         for book in self.__books:
