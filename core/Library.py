@@ -51,22 +51,24 @@ class Library:
         return candidates
 
     def borrow_book(self, isbn: str, user_name: str) -> Book:
-        found_book = self.__lookup_book(isbn)
+        book = self.__lookup_book(isbn)
 
-        if found_book.isbn not in self.__borrowed_books:
-            self.__borrowed_books[found_book.isbn] = list()
+        if book.isbn in self.__borrowed_books and len(self.__borrowed_books[book.isbn]) >= book.stock:
+            raise BookBorrowedError(f'Book {book.title} has already been borrowed by someone else.')
+        if book.isbn not in self.__borrowed_books:
+            self.__borrowed_books[book.isbn] = list()
 
-        self.__borrowed_books[found_book.isbn].append(user_name)
+        self.__borrowed_books[book.isbn].append(user_name)
 
-        return found_book
+        return book
 
     def list_stock(self) -> list[(Book, int)]:
         stock = []
 
-        for key in self.__borrowed_books:
-            book = self.__lookup_book(key)
+        for book in self.__books:
+            borrowed_count = len(self.__borrowed_books[book.isbn]) if book.isbn in self.__borrowed_books else 0
 
-            stock.append((book, book.stock - len(self.__borrowed_books[key])))
+            stock.append((book, book.stock - borrowed_count))
 
         return stock
 
@@ -74,8 +76,6 @@ class Library:
         for book in self.__books:
             if book.isbn != isbn:
                 continue
-            if book.isbn in self.__borrowed_books and len(self.__borrowed_books[book.isbn]) >= book.stock:
-                raise BookBorrowedError(f'Book {book.title} has already been borrowed by someone else.')
 
             return book
 
