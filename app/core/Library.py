@@ -1,5 +1,5 @@
 from .errors import BookBorrowedError, BookNotBorrowedError, BookNotFoundError
-from .models import Author, Book
+from .models import Book
 
 from .functions import lev_dist
 

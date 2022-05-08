@@ -4,6 +4,9 @@ This is a project I made for one of my university classes. It's a simple program
 emulating a virtual library. User can borrow and return books from the library. If 
 run with the -f option, you can load custom csv library file instead of the
 default one.
+<br/>
+The project also contains some unit tests, but since the project was intended to be just a simple 
+demonstration, so are the tests.
 
 ## How to run it
 
