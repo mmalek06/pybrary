@@ -1,7 +1,7 @@
 from .errors import BookBorrowedError, BookNotBorrowedError, BookNotFoundError
 from .models import Book
 
-from .functions import lev_dist
+from .search import lev_dist
 
 
 class Library:
