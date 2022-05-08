@@ -1,7 +1,7 @@
-from core.io import ConsoleInput, ConsoleOutput
-from core.enums import ActionType
-from core.models import Book
-from ui.validation import non_empty_validator
+from app.core.io import ConsoleInput, ConsoleOutput
+from app.core.enums import ActionType
+from app.core.models import Book
+from app.ui.validation import non_empty_validator
 
 
 class UI:
@@ -63,7 +63,7 @@ class UI:
             if self.__chosen_action is ActionType.BORROW_BOOK:
                 self.__borrow_book()
             if self.__chosen_action is ActionType.RETURN_BOOK:
-                pass
+                self.__return_book()
             if self.__chosen_action is ActionType.LIST_STOCK:
                 self.__list_stock()
         except Exception as exc:
@@ -93,8 +93,9 @@ class UI:
 
             self.__output.print('')
 
-            for book in result:
-                self.__output.print(book)
+            if len(result) > 0:
+                for book in result:
+                    self.__output.print(book)
             else:
                 self.__output.print(f'No book found for the author {author_name}')
 
@@ -118,8 +119,9 @@ class UI:
             if isinstance(result, Book):
                 self.__output.print(result)
             elif isinstance(result, list):
-                for book in result:
-                    self.__output.print(book)
+                if len(result) > 0:
+                    for book in result:
+                        self.__output.print(book)
                 else:
                     self.__output.print(f'No book found for the search phrase: {book_name}')
 
@@ -145,6 +147,28 @@ class UI:
 
             if isinstance(result, Book):
                 self.__output.print(f'{result} borrowed.')
+
+    def __return_book(self):
+        if ActionType.RETURN_BOOK not in self.__callbacks:
+            return
+
+        self.__output.print('Please type in the ISBN of the book you would like to borrow: ')
+
+        isbn = self.__input.input()
+
+        non_empty_validator(isbn)
+
+        self.__output.print('')
+        self.__output.print('Please type in the name of the person that borrowed the book: ')
+
+        user_name = self.__input.input()
+
+        non_empty_validator(user_name)
+
+        for callback in self.__callbacks[ActionType.RETURN_BOOK]:
+            callback(isbn, user_name)
+
+        self.__output.print(f'Book with ISBN {isbn} has been returned.')
 
     def __list_stock(self):
         if ActionType.LIST_STOCK not in self.__callbacks:

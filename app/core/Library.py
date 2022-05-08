@@ -1,6 +1,4 @@
-import typing
-
-from .errors import BookBorrowedError, BookNotFoundError
+from .errors import BookBorrowedError, BookNotBorrowedError, BookNotFoundError
 from .models import Author, Book
 
 from .functions import lev_dist
@@ -9,7 +7,7 @@ from .functions import lev_dist
 class Library:
     __borrowed_books: dict[str, list[str]]
     __books: list[Book]
-    __book_search_sensitivity: int = 10
+    __book_search_sensitivity: int = 4
     __author_search_sensitivity: int = 2
 
     def __init__(self, books: list[Book]):
@@ -32,7 +30,7 @@ class Library:
 
         return found_books
 
-    def find_book(self, maybe_title: str) -> typing.List[Book] | Book:
+    def find_book(self, maybe_title: str) -> list[Book]:
         candidates = []
 
         for book in self.__books:
@@ -45,8 +43,6 @@ class Library:
 
         if len(candidates) == 0:
             raise BookNotFoundError(f'''A book entitled {maybe_title} not found and there are no similarly entitled books in the library.''')
-        if candidates[0].title is maybe_title:
-            return candidates[0]
 
         return candidates
 
@@ -61,6 +57,19 @@ class Library:
         self.__borrowed_books[book.isbn].append(user_name)
 
         return book
+
+    def return_book(self, isbn: str, user_name: str):
+        book = self.__lookup_book(isbn)
+
+        if book.isbn not in self.__borrowed_books:
+            raise BookNotBorrowedError(f'A book with ISBN = {isbn} has not been borrowed by anyone yet.')
+
+        users = self.__borrowed_books[book.isbn]
+
+        if user_name not in users:
+            raise BookNotBorrowedError(f'A book with ISBN = {isbn} has not been borrowed by {user_name} yet.')
+
+        users.remove(user_name)
 
     def list_stock(self) -> list[(Book, int)]:
         stock = []
@@ -79,4 +88,4 @@ class Library:
 
             return book
 
-        raise BookNotFoundError(f'A book with isbn = {isbn} not found.')
+        raise BookNotFoundError(f'A book with ISBN = {isbn} not found.')
